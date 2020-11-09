@@ -59,6 +59,15 @@ def _test_multiple_connections(server):
     assert p.decode('utf-8').strip() == 'hello'
 
 
+def test_stdin(server):
+    for uid in server.users:
+        with server.client(uid) as c:
+            stdin, stdout, _ = c.exec_command("sed s/input/output")
+            stdin.write("input")
+            stdin.flush()
+            assert stdout.read().decode("utf8") == "output"
+
+
 def test_invalid_user(server):
     with raises(KeyError) as exc:
         server.client("unknown-user")
